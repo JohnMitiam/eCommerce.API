@@ -2,7 +2,7 @@
 
 namespace eCommerce.Infrastructure.Data
 {
-    internal class UnitofWork : IUnitofWork
+    public class UnitofWork : IUnitofWork
     {
         private readonly DatabaseSession _dbSession;
         private readonly IProductRepository _productRepository;

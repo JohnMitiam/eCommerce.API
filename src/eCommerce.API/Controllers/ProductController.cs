@@ -68,7 +68,7 @@ namespace eCommerce.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCurrencyAsync([FromBody] CreateProductDTO product)
+        public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductDTO product)
         {
             var userId = User.GetUserId();
 
@@ -86,7 +86,7 @@ namespace eCommerce.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCurrencyAsync([FromRoute] int id, [FromBody] UpdateProductDTO product)
+        public async Task<IActionResult> UpdateProductAsync([FromRoute] int id, [FromBody] UpdateProductDTO product)
         {
             if (id == 0 || id != product.Id)
             {
@@ -111,7 +111,7 @@ namespace eCommerce.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCurrencyAsync([FromRoute] int id)
+        public async Task<IActionResult> DeleteProductAsync([FromRoute] int id)
         {
             if (id == 0)
             {

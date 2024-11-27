@@ -4,7 +4,7 @@ using System.Data;
 
 namespace eCommerce.Infrastructure.Data
 {
-    internal class DatabaseSession : IDisposable
+    public sealed class DatabaseSession : IDisposable
     {
         public IDbConnection? Connection = null;
         public IDbTransaction? Transaction = null;

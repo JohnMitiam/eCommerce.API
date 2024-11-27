@@ -1,5 +1,6 @@
 ﻿using eCommerce.Application.Interfaces.Data;
 using eCommerce.Infrastructure.Data;
+using eCommerce.Infrastructure.Data.Repositories;
 using Hangfire;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,7 @@ public static class InfrastructureExtensions
         services.AddHangfireServer();
 
         // Stored Procedure Repositories
-        //services.AddTransient<IProductRepository, ProductRepository>();
+        services.AddTransient<IProductRepository, ProductRepository>();
 
         services.AddScoped<IUnitofWork, UnitofWork>();
 

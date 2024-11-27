@@ -1,13 +1,32 @@
+using eCommerce.Application;
+using eCommerce.Infrastructure;
+using Hangfire;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
+// Configure Logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "allow-all",
+        policy =>
+        {
+            policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+        });
+});
+
+builder.Services.AddControllers();
+
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -24,6 +43,10 @@ var app = builder.Build();
 //}
 
 app.UseHttpsRedirection();
+
+app.UseHangfireDashboard();
+
+app.UseCors("allow-all");
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
@@ -49,6 +72,10 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 //})
 //.WithName("GetWeatherForecast")
 //.WithOpenApi();
+
+app.UseRouting();
+
+app.MapControllers();
 
 app.Run();
 
