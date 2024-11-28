@@ -13,7 +13,7 @@ namespace eCommerce.Application.Validators.ProductValidators
                 return (true, null);
             }
 
-            return (false, new List<string> { "Description exceeds 100 characters." });
+            return (false, new List<string> { "Description exceeds 1000 characters." });
         }
 
         public override async Task<(bool isSuccess, List<string>? errorMessages)> IsValidAsync(Product value)
