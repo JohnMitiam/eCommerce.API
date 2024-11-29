@@ -7,8 +7,7 @@ namespace eCommerce.Infrastructure.Data
         private readonly DatabaseSession _dbSession;
         private readonly IProductRepository _productRepository;
 
-        public UnitofWork(DatabaseSession dbSession,
-            IProductRepository productRepository)
+        public UnitofWork(DatabaseSession dbSession, IProductRepository productRepository)
         {
             _dbSession = dbSession;
             _productRepository = productRepository;

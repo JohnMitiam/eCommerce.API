@@ -6,11 +6,11 @@ namespace eCommerce.Application.Interfaces.Services
 {
     public interface IProductService
     {
-        Task<IServiceResult> GetByIdAsync(int productId);
-        Task<IServiceResult> GetAsync(ProductResourceParameters resourceParameters);
-        Task<IServiceResult> CreateAsync(CreateProductDTO product, string userId);
-        Task<IServiceResult> UpdateAsync(int productId, UpdateProductDTO product, string userId);
-        Task<IServiceResult> DeleteAsync(int productId, string userId);
+        Task<ViewProductDTO> GetByIdAsync(int productId);
+        Task<PaginatedList<ViewProductDTO>> GetAsync(ProductResourceParameters resourceParameters);
+        Task<ViewProductDTO> CreateAsync(CreateProductDTO product);
+        Task<bool> UpdateAsync(int productId, UpdateProductDTO product);
+        Task<bool> DeleteAsync(int productId);
 
     }
 }

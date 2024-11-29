@@ -116,10 +116,10 @@ namespace eCommerce.Infrastructure.Data
             return sqlQuery;
         }
 
-        public void AddParam(string paramKey, object paramValue)
-        {
-            Parameters.Add(paramKey, paramValue);
-        }
+        //public void AddParam(string paramKey, object paramValue)
+        //{
+        //    Parameters.Add(paramKey, paramValue);
+        //}
 
         public bool HasPaginationParameter
         {

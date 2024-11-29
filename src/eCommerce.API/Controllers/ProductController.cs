@@ -1,9 +1,6 @@
-﻿using eCommerce.API.Extensions;
-using eCommerce.Application.DTOs.Product;
+﻿using eCommerce.Application.DTOs.Product;
 using eCommerce.Application.Interfaces.Services;
 using eCommerce.Application.ResourceParameters;
-using eCommerce.Application.ResultModels;
-using eCommerce.Application.Services.Base;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.API.Controllers
@@ -13,101 +10,64 @@ namespace eCommerce.API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _product;
-        private readonly string _userId = "1";
-        private IServiceResult ServiceResult { get; set; } = null!;
         public ProductController(IProductService product)
         {
             _product = product;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProductsAsync([FromQuery] ProductResourceParameters resourceParameters)
+        public async Task<IActionResult> GetProductsAsync(string? search, int page=1, int pagesize=10)
         {
-            ServiceResult = await _product.GetAsync(resourceParameters);
-
-            if (ServiceResult.IsSuccess)
+            var resourceParameters = new ProductResourceParameters
             {
-                var result = ServiceResult as ServiceResult<PaginatedList<ViewProductDTO>>;
+                Search = search,
+                PageSize = pagesize,
+                Page = page,
+            };
+            var records = await _product.GetAsync(resourceParameters);
 
-                if (result != null)
-                {
-                    return Ok(new
-                    {
-                        data = result.Data,
-                        total = result.Data.TotalCount,
-                        page = result.Data.Page,
-                        pageSize = result.Data.PageSize,
-                        totalPages = result.Data.TotalPages,
-                    });
-                }
-            }
-
-            return BadRequest(ServiceResult);
+            return Ok(new
+            {
+                data = records,
+                total = records.TotalCount,
+                page = resourceParameters.Page,
+                pagesize = resourceParameters.PageSize,
+                totalPages = records.TotalPages,
+            });
         }
 
-        [HttpGet("{id}", Name = nameof(ProductController.GetProductsAsync))]
+        [HttpGet("{id}", Name = nameof(ProductController.GetProductByIdAsync))]
         public async Task<IActionResult> GetProductByIdAsync(int id)
         {
-            ServiceResult = await _product.GetByIdAsync(id);
-
-            if (ServiceResult.IsSuccess)
-            {
-                var result = ServiceResult as ServiceResult<ViewProductDTO>;
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-            }
-
-            if (ServiceResult.ErrorMessage == ServiceConstants.RecordNotFound)
+            var product = await _product.GetByIdAsync(id);
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return BadRequest(ServiceResult);
+            return Ok(product);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateProductAsync([FromBody] CreateProductDTO product)
         {
-            var userId = User.GetUserId();
+            var record = await _product.CreateAsync(product);
 
-            ServiceResult = await _product.CreateAsync(product, userId);
+            if (record == null)
+                return BadRequest("Failed");
 
-            if (ServiceResult.IsSuccess)
-            {
-                var result = ServiceResult as ServiceResult<ViewProductDTO>;
-
-                if (result != null)
-                    return CreatedAtRoute(nameof(ProductController.GetProductByIdAsync), new { id = result.Data.Id }, result);
-            }
-
-            return BadRequest(ServiceResult);
+            return CreatedAtRoute(nameof(ProductController.GetProductByIdAsync), new { id = record.Id }, record);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProductAsync([FromRoute] int id, [FromBody] UpdateProductDTO product)
         {
-            if (id == 0 || id != product.Id)
-            {
-                return BadRequest();
-            }
+            var isSuccess = await _product.UpdateAsync(id, product);
 
-            var userId = User.GetUserId();
-
-            ServiceResult = await _product.UpdateAsync(id, product, userId);
-
-            if (ServiceResult.IsSuccess)
-            {
-                return NoContent();
-            }
-
-            if (ServiceResult.ErrorMessage == ServiceConstants.RecordNotFound)
-            {
+            if (!isSuccess)
                 return NotFound();
-            }
 
-            return BadRequest(ServiceResult);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
@@ -118,19 +78,18 @@ namespace eCommerce.API.Controllers
                 return BadRequest();
             }
 
-            var userId = User.GetUserId();
-
-            ServiceResult = await _product.DeleteAsync(id, userId);
-
-            if (ServiceResult.IsSuccess)
-                return NoContent();
-
-            if (ServiceResult.ErrorMessage == ServiceConstants.RecordNotFound)
+            var product = await _product.GetByIdAsync(id);
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return BadRequest(ServiceResult);
+            var isSuccess = await _product.DeleteAsync(id);
+
+            if (!isSuccess)
+                return NotFound();
+
+            return NoContent();
 
         }
     }

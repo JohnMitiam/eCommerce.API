@@ -12,13 +12,12 @@ namespace eCommerce.Infrastructure.Data
         public DatabaseSession(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("DbConnection");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("Connection string 'DbConnection' is missing or empty.");
+            }
+            Console.WriteLine($"Connection String: {connectionString}");
 
-            Connection = new MySqlConnection(connectionString);
-            Connection.Open();
-        }
-
-        public DatabaseSession(string connectionString)
-        {
             Connection = new MySqlConnection(connectionString);
             Connection.Open();
         }

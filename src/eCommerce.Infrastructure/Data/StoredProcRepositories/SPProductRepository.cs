@@ -2,15 +2,20 @@
 using eCommerce.Application.Interfaces.Data;
 using eCommerce.Application.ResourceParameters;
 using eCommerce.Domain.Entities;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace eCommerce.Infrastructure.Data.Repositories
+namespace eCommerce.Infrastructure.Data.StoredProcRepositories
 {
-    public class ProductRepository : IProductRepository
+    public class SPProductRepository : IProductRepository
     {
         private readonly DatabaseSession _dbSession;
 
-        public ProductRepository(DatabaseSession dbSession)
+        public SPProductRepository(DatabaseSession dbSession)
         {
             _dbSession = dbSession;
         }
@@ -33,21 +38,21 @@ namespace eCommerce.Infrastructure.Data.Repositories
                 DateCreated = product.DateCreated,
             };
 
-            product.Id = await _dbSession.Connection.ExecuteScalarAsync<int>(query, queryParams, _dbSession.Transaction);
+            product.Id = await _dbSession.Connection.ExecuteScalarAsync<int>(query, queryParams, _dbSession.Transaction, commandType: CommandType.StoredProcedure);
 
             return product;
         }
 
         public async Task<bool> DeleteAsync(int productId)
         {
-            var query = $@"UPDATE Organization SET IsDeleted=1 WHERE ID=@ID;";
+            var query = $@"sp_DeleteProduct;";
 
             var queryParams = new
             {
                 ProductId = productId
             };
 
-            await _dbSession.Connection.ExecuteAsync(query, queryParams, _dbSession.Transaction);
+            await _dbSession.Connection.ExecuteAsync(query, queryParams, _dbSession.Transaction, commandType: CommandType.StoredProcedure);
 
             return true;
         }
@@ -84,7 +89,7 @@ namespace eCommerce.Infrastructure.Data.Repositories
 
         public async Task<Product?> GetByIdAsync(int productId)
         {
-            var query = $@"SELECT * FROM Product WHERE IsDeleted=0 AND ID=@ID;";
+            var query = $@"sp_GetProductById;";
             var queryParams = new
             {
                 ProductId = productId
