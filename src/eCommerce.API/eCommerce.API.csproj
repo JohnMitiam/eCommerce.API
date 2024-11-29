@@ -7,18 +7,17 @@
 	  <Version>0.1.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="MySql.Data" Version="9.1.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\eCommerce.Application\eCommerce.Application.csproj" />
-		<ProjectReference Include="..\eCommerce.Domain\eCommerce.Domain.csproj" />
 		<ProjectReference Include="..\eCommerce.Infrastructure\eCommerce.Infrastructure.csproj" />
 	</ItemGroup>
 

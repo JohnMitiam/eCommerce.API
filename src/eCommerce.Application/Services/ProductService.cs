@@ -25,20 +25,16 @@ namespace eCommerce.Application.Services
             _UnitOfWork = unitofwork;
             _validator = validator;
         }
-        public async Task<IServiceResult> CreateAsync(CreateProductDTO product, string userId)
+        
+        public async Task<ViewProductDTO?> CreateAsync(CreateProductDTO product)
         {
             try
             {
                 var record = _mapper.Map<Product>(product);
-                record.CreatedBy = userId;
+                record.CreatedBy = "1";
                 record.DateCreated = DateTime.UtcNow;
 
-                var validationResult = _validator.IsValid(record);
-                if (!validationResult.isSuccess)
-                {
-                    var errorMessage = validationResult.errorMessages != null ? string.Join(". ", validationResult.errorMessages) : "Validation failed";
-                    return FailedResult(errorMessage);
-                }
+                await _validator.IsValidAsync(record);
 
                 _UnitOfWork.CreateTransaction();
 
@@ -46,7 +42,7 @@ namespace eCommerce.Application.Services
 
                 _UnitOfWork.Commit();
 
-                return SuccessResult(_mapper.Map<ViewProductDTO>(record));
+                return _mapper.Map<ViewProductDTO>(record);
 
             }
             catch (Exception ex)
@@ -55,39 +51,37 @@ namespace eCommerce.Application.Services
                 _logger.LogError($@"{ex.Message}");
             }
 
-            return FailedResult("An error occured while processing your request.");
+            return null;
         }
 
-        public async Task<IServiceResult> DeleteAsync(int currencyId, string userId)
+        public async Task<bool> DeleteAsync(int product)
         {
             try
             {
-                var record = await _UnitOfWork.Products.GetByIdAsync(currencyId);
+                var record = await _UnitOfWork.Products.GetByIdAsync(product);
                 if (record == null)
                 {
-                    return FailedResult(ServiceConstants.RecordNotFound);
+                    return false;
                 }
-
-                record.UpdatedBy = userId;
-                record.DateUpdated = DateTime.UtcNow;
 
                 _UnitOfWork.CreateTransaction();
                 await _UnitOfWork.Products.DeleteAsync(record.Id);
                 _UnitOfWork.Commit();
 
-                return SuccessResult();
+                return true;
             }
             catch (Exception ex)
             {
                 _UnitOfWork.Rollback();
                 _logger.LogError($@"{ex.Message}");
-
-                return FailedResult("An error occured while processing your request.");
             }
+
+            return false;
         }
 
-        public async Task<IServiceResult> GetAsync(ProductResourceParameters resourceParameters)
+        public async Task<PaginatedList<ViewProductDTO>> GetAsync(ProductResourceParameters resourceParameters)
         {
+            resourceParameters.SearchFields = new List<string> { "Name", "Description" };
             var result = await _UnitOfWork.Products.GetAsync(resourceParameters).ConfigureAwait(false);
 
             var paginatedResult = new PaginatedList<ViewProductDTO>(
@@ -96,55 +90,37 @@ namespace eCommerce.Application.Services
                 resourceParameters.Page,
                 resourceParameters.PageSize);
 
-            return SuccessResult(paginatedResult);
+            return paginatedResult;
         }
 
-        public async Task<IServiceResult> GetByIdAsync(int currencyId)
+        public async Task<ViewProductDTO?> GetByIdAsync(int productId)
         {
-            try
-            {
-                var record = await _UnitOfWork.Products.GetByIdAsync(currencyId).ConfigureAwait(false);
+            var record = await _UnitOfWork.Products.GetByIdAsync(productId).ConfigureAwait(false);
 
-                return SuccessResult(_mapper.Map<ViewProductDTO>(record));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $@"{ex.Message}");
-
-                return FailedResult("An error occured while processing your request.");
-            }
+            return _mapper.Map<ViewProductDTO>(record);
         }
 
-        public async Task<IServiceResult> UpdateAsync(int productId, UpdateProductDTO product, string userId)
+        public async Task<bool> UpdateAsync(int productId, UpdateProductDTO product)
         {
             try
             {
                 var record = await _UnitOfWork.Products.GetByIdAsync(productId).ConfigureAwait(false);
                 if (record == null)
-                    return FailedResult(ServiceConstants.RecordNotFound);
+                    return false;
 
                 _mapper.Map(product, record);
-
-
-                var validationResult = _validator.IsValid(record);
-                if (!validationResult.isSuccess)
-                {
-                    var errorMessage = validationResult.errorMessages != null ? string.Join(". ", validationResult.errorMessages) : "Validation failed";
-                    return FailedResult(errorMessage);
-                }
 
                 _UnitOfWork.CreateTransaction();
                 await _UnitOfWork.Products.UpdateAsync(record).ConfigureAwait(false);
                 _UnitOfWork.Commit();
 
-                return SuccessResult();
+                return true;
             }
             catch (Exception ex)
             {
                 _UnitOfWork.Rollback();
                 _logger.LogError($@"{ex.Message}");
-
-                return FailedResult("An error occured while processing your request.");
+                return false;
             }
         }
     }

@@ -13,6 +13,7 @@ namespace eCommerce.Application
         {
             services.AddAutoMapper(typeof(MappingProfile));
             services.AddTransient<IProductService, ProductService>();
+
             services.AddTransient<IProductValidator, ProductValidator>();
 
             return services;

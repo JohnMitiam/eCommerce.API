@@ -1,7 +1,7 @@
 ﻿using eCommerce.Application.Interfaces.Data;
 using eCommerce.Infrastructure.Data;
 using eCommerce.Infrastructure.Data.Repositories;
-using Hangfire;
+using eCommerce.Infrastructure.Data.StoredProcRepositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,17 +13,13 @@ public static class InfrastructureExtensions
     {
         services.AddScoped<DatabaseSession>();
 
-        services.AddHangfire(config => config
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseInMemoryStorage());
-
         // Add the processing server as IHostedService
-        services.AddHangfireServer();
+
+        // Inline SQL Repositories
+        services.AddTransient<IProductRepository, ProductRepository>();
 
         // Stored Procedure Repositories
-        services.AddTransient<IProductRepository, ProductRepository>();
+        //services.AddTransient<IProductRepository, SPProductRepository>();
 
         services.AddScoped<IUnitofWork, UnitofWork>();
 
