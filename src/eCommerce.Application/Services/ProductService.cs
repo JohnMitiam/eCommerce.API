@@ -5,13 +5,12 @@ using eCommerce.Application.Interfaces.Services;
 using eCommerce.Application.Interfaces.Validator;
 using eCommerce.Application.ResourceParameters;
 using eCommerce.Application.ResultModels;
-using eCommerce.Application.Services.Base;
 using eCommerce.Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace eCommerce.Application.Services
 {
-    public class ProductService : BaseService, IProductService
+    public class ProductService : IProductService
     {
         private readonly IProductValidator _validator;
         private readonly ILogger<ProductService> _logger;
@@ -54,11 +53,11 @@ namespace eCommerce.Application.Services
             return null;
         }
 
-        public async Task<bool> DeleteAsync(int product)
+        public async Task<bool> DeleteAsync(int productId)
         {
             try
             {
-                var record = await _UnitOfWork.Products.GetByIdAsync(product);
+                var record = await _UnitOfWork.Products.GetByIdAsync(productId);
                 if (record == null)
                 {
                     return false;

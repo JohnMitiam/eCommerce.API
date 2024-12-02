@@ -108,7 +108,7 @@ namespace eCommerce.Infrastructure.Data.Repositories
                 IsActive = product.IsActive,
                 CreatedBy = product.CreatedBy,
                 DateCreated = product.DateCreated,
-                ProductId = product.Id
+                Id = product.Id
             };
 
             await _dbSession.Connection.ExecuteAsync(query, queryParams, _dbSession.Transaction, commandType: CommandType.StoredProcedure);

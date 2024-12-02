@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eCommerce.Domain.Entities.Base;
+﻿using eCommerce.Domain.Entities.Base;
 
 namespace eCommerce.Domain.Entities
 {
@@ -14,6 +9,5 @@ namespace eCommerce.Domain.Entities
         public decimal? Price { get; set; }
         public decimal? ItemStocks {  get; set; }
         public bool? IsActive { get; set; }
-        public IEnumerable<Product> Products { get; set; } = null!;
     }
 }

@@ -20,8 +20,8 @@ namespace eCommerce.Application.ResultModels
             AddRange(items);
         }
 
-        public int Page { get { return _currentPage; } }
-        public int PageSize { get { return _pageSize; } }
+        //public int Page { get { return _currentPage; } }
+        //public int PageSize { get { return _pageSize; } }
         public int TotalCount { get { return _totalCount; } }
         public int TotalPages => (int)Math.Ceiling(_totalCount / (double)_pageSize);
         public bool HasPrevious => (_currentPage > 1);
